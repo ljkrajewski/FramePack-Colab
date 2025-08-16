@@ -12,6 +12,7 @@ import safetensors.torch as sf
 import numpy as np
 import argparse
 import math
+import shutil
 
 from PIL import Image
 from diffusers import AutoencoderKLHunyuanVideo
@@ -27,6 +28,15 @@ from transformers import SiglipImageProcessor, SiglipVisionModel
 from diffusers_helper.clip_vision import hf_clip_vision_encode
 from diffusers_helper.bucket_tools import find_nearest_bucket
 
+# Check if running in Google Colab
+try:
+    import google.colab
+    IN_COLAB = True
+except ImportError:
+    IN_COLAB = False
+
+if IN_COLAB:
+    from google.colab import drive, runtime
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--share', action='store_true')
@@ -100,7 +110,7 @@ os.makedirs(outputs_folder, exist_ok=True)
 
 
 @torch.no_grad()
-def worker(input_image, prompt, n_prompt, seed, total_second_length, latent_window_size, steps, cfg, gs, rs, gpu_memory_preservation, use_teacache, mp4_crf):
+def worker(input_image, prompt, n_prompt, seed, total_second_length, latent_window_size, steps, cfg, gs, rs, gpu_memory_preservation, use_teacache, mp4_crf, mount_drive):
     total_latent_sections = (total_second_length * 30) / (latent_window_size * 4)
     total_latent_sections = int(max(round(total_latent_sections), 1))
 
@@ -303,6 +313,15 @@ def worker(input_image, prompt, n_prompt, seed, total_second_length, latent_wind
 
             if is_last_section:
                 break
+
+        # Handle Google Drive mounting and copying if in Colab and option selected
+        if IN_COLAB and mount_drive:
+            drive.mount('/content/drive')
+            drive_output_dir = '/content/drive/MyDrive/FramePack_Videos'
+            os.makedirs(drive_output_dir, exist_ok=True)
+            shutil.copy(output_filename, os.path.join(drive_output_dir, os.path.basename(output_filename)))
+            print(f"Video copied to {drive_output_dir}/{os.path.basename(output_filename)}")
+
     except:
         traceback.print_exc()
 
@@ -315,7 +334,7 @@ def worker(input_image, prompt, n_prompt, seed, total_second_length, latent_wind
     return
 
 
-def process(input_image, prompt, n_prompt, seed, total_second_length, latent_window_size, steps, cfg, gs, rs, gpu_memory_preservation, use_teacache, mp4_crf):
+def process(input_image, prompt, n_prompt, seed, total_second_length, latent_window_size, steps, cfg, gs, rs, gpu_memory_preservation, use_teacache, mp4_crf, mount_drive, suicide_switch):
     global stream
     assert input_image is not None, 'No input image!'
 
@@ -323,7 +342,7 @@ def process(input_image, prompt, n_prompt, seed, total_second_length, latent_win
 
     stream = AsyncStream()
 
-    async_run(worker, input_image, prompt, n_prompt, seed, total_second_length, latent_window_size, steps, cfg, gs, rs, gpu_memory_preservation, use_teacache, mp4_crf)
+    async_run(worker, input_image, prompt, n_prompt, seed, total_second_length, latent_window_size, steps, cfg, gs, rs, gpu_memory_preservation, use_teacache, mp4_crf, mount_drive)
 
     output_filename = None
 
@@ -341,6 +360,11 @@ def process(input_image, prompt, n_prompt, seed, total_second_length, latent_win
         if flag == 'end':
             yield output_filename, gr.update(visible=False), gr.update(), '', gr.update(interactive=True), gr.update(interactive=False)
             break
+
+    # Handle suicide switch if in Colab and option selected
+    if IN_COLAB and suicide_switch:
+        print("Job completed. Disconnecting and deleting runtime...")
+        runtime.unassign()
 
 
 def end_process():
@@ -387,6 +411,10 @@ with block:
 
                 mp4_crf = gr.Slider(label="MP4 Compression", minimum=0, maximum=100, value=16, step=1, info="Lower means better quality. 0 is uncompressed. Change to 16 if you get black outputs. ")
 
+            with gr.Group(visible=IN_COLAB):
+                mount_drive = gr.Checkbox(label='Mount Google Drive and copy created video', value=False)
+                suicide_switch = gr.Checkbox(label='Disconnect and delete runtime when job is done', value=False)
+
         with gr.Column():
             preview_image = gr.Image(label="Next Latents", height=200, visible=False)
             result_video = gr.Video(label="Finished Frames", autoplay=True, show_share_button=False, height=512, loop=True)
@@ -396,7 +424,7 @@ with block:
 
     gr.HTML('<div style="text-align:center; margin-top:20px;">Share your results and find ideas at the <a href="https://x.com/search?q=framepack&f=live" target="_blank">FramePack Twitter (X) thread</a></div>')
 
-    ips = [input_image, prompt, n_prompt, seed, total_second_length, latent_window_size, steps, cfg, gs, rs, gpu_memory_preservation, use_teacache, mp4_crf]
+    ips = [input_image, prompt, n_prompt, seed, total_second_length, latent_window_size, steps, cfg, gs, rs, gpu_memory_preservation, use_teacache, mp4_crf, mount_drive, suicide_switch]
     start_button.click(fn=process, inputs=ips, outputs=[result_video, preview_image, progress_desc, progress_bar, start_button, end_button])
     end_button.click(fn=end_process)
 
