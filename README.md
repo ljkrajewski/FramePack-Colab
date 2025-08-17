@@ -4,7 +4,7 @@ To run:
 - Open FramePack-colab.ipynb in Google Colab.
 
 To do:
-- [First and last frame|https://ageofllms.com/ai-tools/ai-fun/framepack-start-end-frames]
+- [First and last frame](https://ageofllms.com/ai-tools/ai-fun/framepack-start-end-frames)
 ----
 <p align="center">
     <img src="https://github.com/user-attachments/assets/2cc030b4-87e1-40a0-b5bf-1b7d6b62820b" width="300">
