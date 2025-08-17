@@ -103,11 +103,8 @@ else:
 
 stream = AsyncStream()
 
-target_dir = os.environ['VIDEOPATH']
-if target_dir=="":
-    outputs_folder = './outputs/'
-else:
-    outputs_folder = target_dir
+videopath = os.environ.get('VIDEOPATH', '')
+outputs_folder = './outputs/'
 os.makedirs(outputs_folder, exist_ok=True)
 
 
@@ -344,6 +341,9 @@ def process(input_image, prompt, n_prompt, seed, total_second_length, latent_win
 
         if flag == 'file':
             output_filename = data
+            if is_colab and os.path.exists('/content/drive') and videopath:
+                os.makedirs(videopath, exist_ok=True)
+                shutil.copy(output_filename, os.path.join(videopath, os.path.basename(output_filename)))
             yield output_filename, gr.update(), gr.update(), gr.update(), gr.update(interactive=False), gr.update(interactive=True)
 
         if flag == 'progress':
@@ -352,10 +352,6 @@ def process(input_image, prompt, n_prompt, seed, total_second_length, latent_win
 
         if flag == 'end':
             yield output_filename, gr.update(visible=False), gr.update(), '', gr.update(interactive=True), gr.update(interactive=False)
-            #if output_filename and is_colab and os.path.exists('/content/drive') and 'VIDEOPATH' in os.environ:
-            #    target_dir = os.environ['VIDEOPATH']
-            #    os.makedirs(target_dir, exist_ok=True)
-            #    shutil.copy(output_filename, os.path.join(target_dir, os.path.basename(output_filename)))
             if suicide_switch:
                 runtime.unassign()
             break
