@@ -1,10 +1,18 @@
 _The main purpose of this fork is to be able to make videos in Google Colab._
 
 To run:  
+- Buy some credits on Colab (Strongly recommend using an 'L4' runtime.)
 - Open FramePack-colab.ipynb in Google Colab.
+- Run the first cell to install pre-requisites. When done, click the button to restart the runtime.
+- If you want to save the video in your Google Drive, enter the directory name you wish to use. Otherwise, leave "directory_name" blank.  
+  _If you get a "Disk nearly full" message, you can ignore it._
+- Run the last cell. When the public gradio link appears, right click on it to open in another window or tab. 
 
 To do:
-- [First and last frame](https://ageofllms.com/ai-tools/ai-fun/framepack-start-end-frames)
+- Use [first and last frames](https://ageofllms.com/ai-tools/ai-fun/framepack-start-end-frames) for video generation.
+
+_Much love to @lllyasviel for their work on the original [FramePack](https://github.com/lllyasviel/FramePack)._
+
 ----
 <p align="center">
     <img src="https://github.com/user-attachments/assets/2cc030b4-87e1-40a0-b5bf-1b7d6b62820b" width="300">
