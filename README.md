@@ -1,7 +1,7 @@
 _The main purpose of this fork is to be able to make videos in Google Colab._
 
 To run:  
-- Buy some credits on Colab (Strongly recommend using an 'L4' runtime.)
+- [Buy some 'compute units'](https://colab.research.google.com/signup) on Colab (required for the 'L4' runtime.)
 - Open FramePack-colab.ipynb in Google Colab.
 - Run the first cell to install pre-requisites. When done, click the button to restart the runtime.
 - If you want to save the video in your Google Drive, enter the directory name you wish to use. Otherwise, leave "directory_name" blank.  
