@@ -308,11 +308,6 @@ def worker(input_image, prompt, n_prompt, seed, total_second_length, latent_wind
 
             print(f'Decoded. Current latent shape {real_history_latents.shape}; pixel shape {history_pixels.shape}')
 
-            if is_last_section:
-                if is_colab and os.path.exists('/content/drive') and videopath:
-                    os.makedirs(videopath, exist_ok=True)
-                    shutil.copy(output_filename, os.path.join(videopath, os.path.basename(output_filename)))
-
             stream.output_queue.push(('file', output_filename))
 
             if is_last_section:
@@ -323,6 +318,16 @@ def worker(input_image, prompt, n_prompt, seed, total_second_length, latent_wind
         final_length = max(0, final_video_frames / 30)
         final_desc = f'Total generated frames: {final_video_frames}, Video length: {final_length :.2f} seconds (FPS-30). Generation complete.'
         stream.output_queue.push(('progress', (None, final_desc, make_progress_bar_html(100, 'Completed'))))
+
+        # Copy final video to VIDEOPATH if set
+        if is_colab and os.path.exists('/content/drive') and videopath:
+            try:
+                print(f"Copying final video {output_filename} to {videopath}")
+                os.makedirs(videopath, exist_ok=True)
+                shutil.copy(output_filename, os.path.join(videopath, os.path.basename(output_filename)))
+                print(f"Successfully copied final video to {os.path.join(videopath, os.path.basename(output_filename))}")
+            except Exception as e:
+                print(f"Error copying final video to {videopath}: {str(e)}")
 
     except:
         traceback.print_exc()
