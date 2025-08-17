@@ -342,8 +342,11 @@ def process(input_image, prompt, n_prompt, seed, total_second_length, latent_win
         if flag == 'file':
             output_filename = data
             if is_colab and os.path.exists('/content/drive') and videopath:
+                videoname=os.path.basename(output_filename)
+                print(f"Copying {videoname} to {videopath}..."}
                 os.makedirs(videopath, exist_ok=True)
-                shutil.copy(output_filename, os.path.join(videopath, os.path.basename(output_filename)))
+                shutil.copy(output_filename, os.path.join(videopath, videoname))
+                print("Done.")
             yield output_filename, gr.update(), gr.update(), gr.update(), gr.update(interactive=False), gr.update(interactive=True)
 
         if flag == 'progress':
