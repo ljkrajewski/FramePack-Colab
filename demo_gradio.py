@@ -104,6 +104,7 @@ else:
 stream = AsyncStream()
 
 videopath = os.environ.get('VIDEOPATH', '')
+print(f'VIDEOPATH environment variable = "{videopath}"')
 outputs_folder = './outputs/'
 os.makedirs(outputs_folder, exist_ok=True)
 
