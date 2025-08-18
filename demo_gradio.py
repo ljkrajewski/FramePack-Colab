@@ -317,8 +317,6 @@ def worker(input_image, prompt, n_prompt, seed, total_second_length, latent_wind
         final_video_frames = int(max(0, total_generated_latent_frames * 4 - 3))
         final_length = max(0, final_video_frames / 30)
         final_desc = f'Total generated frames: {final_video_frames}, Video length: {final_length :.2f} seconds (FPS-30). Generation complete.'
-        stream.output_queue.push(('progress', (None, final_desc, make_progress_bar_html(100, 'Completed'))))
-
         # Copy final video to VIDEOPATH if set
         if is_colab and os.path.exists('/content/drive') and videopath:
             try:
@@ -328,6 +326,7 @@ def worker(input_image, prompt, n_prompt, seed, total_second_length, latent_wind
                 print(f"Successfully copied final video to {os.path.join(videopath, os.path.basename(output_filename))}")
             except Exception as e:
                 print(f"Error copying final video to {videopath}: {str(e)}")
+        stream.output_queue.push(('progress', (None, final_desc, make_progress_bar_html(100, 'Completed'))))
 
     except:
         traceback.print_exc()
