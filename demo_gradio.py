@@ -313,7 +313,7 @@ def worker(input_image, prompt, n_prompt, seed, total_second_length, latent_wind
 
             # Copy video to VIDEOPATH if set
             #if is_colab and os.path.exists('/content/drive') and videopath:
-            if os.path.exists('/content/drive') and (videopath != ""):
+            if not (videopath == ""):
                 try:
                     print(f"Copying video {output_filename} to {videopath}")
                     os.makedirs(videopath, exist_ok=True)
