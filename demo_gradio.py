@@ -232,6 +232,7 @@ def worker(input_image, prompt, n_prompt, seed, total_second_length, latent_wind
                 transformer.initialize_teacache(enable_teacache=False)
 
             def callback(d):
+                global videopath
                 preview = d['denoised']
                 preview = vae_decode_fake(preview)
 
@@ -311,7 +312,8 @@ def worker(input_image, prompt, n_prompt, seed, total_second_length, latent_wind
             print(f'Decoded. Current latent shape {real_history_latents.shape}; pixel shape {history_pixels.shape}')
 
             # Copy video to VIDEOPATH if set
-            if is_colab and os.path.exists('/content/drive') and videopath:
+            #if is_colab and os.path.exists('/content/drive') and videopath:
+            if os.path.exists('/content/drive') and (videopath != ""):
                 try:
                     print(f"Copying video {output_filename} to {videopath}")
                     os.makedirs(videopath, exist_ok=True)
