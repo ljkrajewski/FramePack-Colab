@@ -408,8 +408,8 @@ with block:
 
                 n_prompt = gr.Textbox(label="Negative Prompt", value="", visible=False)  # Not used
                 seed = gr.Number(label="Seed (0=random)", value=31337, precision=0)
-                if seed == 0;
-                    seed = random.randint(0, 18446744073709551615)
+                #if seed == 0;
+                #    seed = random.randint(0, 18446744073709551615)
 
                 total_second_length = gr.Slider(label="Total Video Length (Seconds)", minimum=1, maximum=120, value=5, step=0.1)
                 latent_window_size = gr.Slider(label="Latent Window Size", minimum=1, maximum=33, value=9, step=1, visible=False)  # Should not change
